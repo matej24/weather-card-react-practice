@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PulseLoader } from 'react-spinners';
 import WeatherCard from './WeatherCard/WeatherCard';
 
 const WeatherEngine = ({ location }) => {
@@ -32,40 +33,44 @@ const WeatherEngine = ({ location }) => {
     setLoading(false);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    getWeather(query);
-  };
-
   useEffect(() => {
     getWeather(location);
   }, [location]);
 
+  if (error) {
+    return (
+      <div style={{ color: 'black' }}>
+        There has been an error!
+        <br />
+        <button onClick={() => setError(false)}>Reset!</button>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          width: '200px',
+          height: '240px',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <PulseLoader color='purple' />
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {!loading && !error ? (
-        <div>
-          <WeatherCard
-            temp={weather.temp}
-            condition={weather.condition}
-            city={weather.city}
-            country={weather.country}
-          />
-          <form>
-            <input value={query} onChange={(e) => setQuery(e.target.value)} />
-            <button onClick={(e) => handleSearch(e)}>Search</button>
-          </form>
-        </div>
-      ) : loading ? (
-        <div style={{ color: 'black' }}>Loading...</div>
-      ) : !loading && error ? (
-        <div style={{ color: 'black' }}>
-          There has been an error!
-          <br />
-          <button onClick={() => setError(false)}>Reset!</button>
-        </div>
-      ) : null}
-    </div>
+    <WeatherCard
+      temp={weather.temp}
+      condition={weather.condition}
+      city={weather.city}
+      country={weather.country}
+      getWeather={getWeather}
+    />
   );
 };
 
